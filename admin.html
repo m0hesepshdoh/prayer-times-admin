@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prayer Times Admin</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f2f5;
+            color: var(--dark);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        h1 {
+            font-size: 2rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        input[type="time"] {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input[type="time"]:focus {
+            border-color: var(--secondary);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+            width: 100%;
+        }
+
+        .btn-primary:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 12px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .success {
+            background-color: rgba(39, 174, 96, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+        }
+
+        .error {
+            background-color: rgba(231, 76, 60, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(231, 76, 60, 0.3);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, .3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .instructions {
+            background-color: #f8f9fa;
+            border-left: 4px solid var(--secondary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-mosque"></i> Prayer Times Admin</h1>
+            <p>Set prayer times for Alharamain Mosque</p>
+        </header>
+
+        <div class="instructions">
+            <p><strong>Instructions:</strong></p>
+            <p>1. Enter prayer times in 24-hour format (HH:MM)</p>
+            <p>2. Click "Save Prayer Times" to update</p>
+            <p>3. Times will be immediately available to the public</p>
+        </div>
+
+        <div class="form-group">
+            <label for="fajr-time">Fajr</label>
+            <input type="time" id="fajr-time" required>
+        </div>
+
+        <div class="form-group">
+            <label for="sunrise-time">Sunrise</label>
+            <input type="time" id="sunrise-time" required>
+        </div>
+
+        <div class="form-group">
+            <label for="dhuhr-time">Dhuhr</label>
+            <input type="time" id="dhuhr-time" required>
+        </div>
+
+        <div class="form-group">
+            <label for="asr-time">Asr</label>
+            <input type="time" id="asr-time" required>
+        </div>
+
+        <div class="form-group">
+            <label for="maghrib-time">Maghrib</label>
+            <input type="time" id="maghrib-time" required>
+        </div>
+
+        <div class="form-group">
+            <label for="isha-time">Isha</label>
+            <input type="time" id="isha-time" required>
+        </div>
+
+        <button id="save-btn" class="btn btn-primary">
+            <i class="fas fa-save"></i> Save Prayer Times
+        </button>
+
+        <div id="status-message" class="status-message"></div>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: 'AIzaSyA0wcgv_6dH14g37F6fdqXv1A97amw23_w',
+            authDomain: 'birthdaymessagesapp.firebaseapp.com',
+            projectId: 'birthdaymessagesapp',
+            storageBucket: 'birthdaymessagesapp.firebasestorage.app',
+            messagingSenderId: '220266164498',
+            appId: '1:220266164498:web:2adcb2520b75f580cd83cb'
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        // DOM elements
+        const saveBtn = document.getElementById('save-btn');
+        const statusMessage = document.getElementById('status-message');
+        const prayerInputs = {
+            fajr: document.getElementById('fajr-time'),
+            sunrise: document.getElementById('sunrise-time'),
+            dhuhr: document.getElementById('dhuhr-time'),
+            asr: document.getElementById('asr-time'),
+            maghrib: document.getElementById('maghrib-time'),
+            isha: document.getElementById('isha-time')
+        };
+
+        // Load current times on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadCurrentTimes();
+        });
+
+        // Load current times from Firestore
+        function loadCurrentTimes() {
+            db.collection("prayerTimes").doc("currentTimes").get()
+                .then(doc => {
+                    if (doc.exists) {
+                        const data = doc.data();
+                        for (const key in prayerInputs) {
+                            if (data[key]) {
+                                prayerInputs[key].value = data[key];
+                            }
+                        }
+                        showStatus("Current times loaded successfully", "success");
+                    } else {
+                        showStatus("No existing times found. Set new times.", "error");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading prayer times:", error);
+                    showStatus("Error loading times. Please try again.", "error");
+                });
+        }
+
+        // Save times to Firestore
+        saveBtn.addEventListener('click', () => {
+            const prayerTimes = {};
+            let isValid = true;
+
+            // Collect values and validate
+            for (const key in prayerInputs) {
+                if (!prayerInputs[key].value) {
+                    isValid = false;
+                    prayerInputs[key].style.borderColor = "red";
+                } else {
+                    prayerTimes[key] = prayerInputs[key].value;
+                    prayerInputs[key].style.borderColor = "";
+                }
+            }
+
+            if (!isValid) {
+                showStatus("Please fill all prayer times", "error");
+                return;
+            }
+
+            // Show loading state
+            saveBtn.innerHTML = '<div class="loading"></div> Saving...';
+            saveBtn.disabled = true;
+
+            // Save to Firestore
+            db.collection("prayerTimes").doc("currentTimes").set(prayerTimes)
+                .then(() => {
+                    showStatus("Prayer times saved successfully!", "success");
+                })
+                .catch(error => {
+                    console.error("Error saving prayer times:", error);
+                    showStatus("Error saving times. Please try again.", "error");
+                })
+                .finally(() => {
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Prayer Times';
+                    saveBtn.disabled = false;
+                });
+        });
+
+        // Show status message
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = "status-message " + type;
+
+            // Auto-hide success messages after 3 seconds
+            if (type === "success") {
+                setTimeout(() => {
+                    statusMessage.textContent = "";
+                    statusMessage.className = "status-message";
+                }, 3000);
+            }
+        }
+    </script>
+</body>
+
+</html>
