@@ -34,7 +34,7 @@
         }
 
         .container {
-            max-width: 600px;
+            max-width: 800px;
             margin: 0 auto;
             background: white;
             border-radius: 10px;
@@ -66,7 +66,9 @@
             color: var(--dark);
         }
 
-        input[type="time"] {
+        input[type="time"],
+        input[type="text"],
+        textarea {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid #ddd;
@@ -75,10 +77,25 @@
             transition: border 0.3s;
         }
 
-        input[type="time"]:focus {
+        .additional-prayer-item-container {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+            background-color: #f9f9f9;
+        }
+
+        input[type="time"]:focus,
+        input[type="text"]:focus,
+        textarea:focus {
             border-color: var(--secondary);
             outline: none;
             box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
         }
 
         .btn {
@@ -149,6 +166,118 @@
             margin: 20px 0;
             border-radius: 0 6px 6px 0;
         }
+
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .toggle-label {
+            margin-right: 10px;
+            font-weight: 500;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .input-with-button {
+            display: flex;
+            gap: 10px;
+        }
+
+        .input-with-button input {
+            flex: 1;
+        }
+
+        .btn-secondary {
+            background-color: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #7f8c8d;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            padding: 12px;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+
+        .news-item-container {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 6px;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked+.slider {
+            background-color: var(--success);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(26px);
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .qr-preview {
+            max-width: 200px;
+            margin-top: 15px;
+            display: none;
+        }
     </style>
 </head>
 
@@ -156,48 +285,232 @@
     <div class="container">
         <header>
             <h1><i class="fas fa-mosque"></i> Prayer Times Admin</h1>
-            <p>Set prayer times for Alharamain Mosque</p>
+            <p>Manage all settings for Alharamain Mosque</p>
         </header>
 
         <div class="instructions">
             <p><strong>Instructions:</strong></p>
             <p>1. Enter prayer times in 24-hour format (HH:MM)</p>
-            <p>2. Click "Save Prayer Times" to update</p>
-            <p>3. Times will be immediately available to the public</p>
+            <p>2. Set up Hijri date, Khutbah details, and QR code information</p>
+            <p>3. Toggle features on/off as needed</p>
+            <p>4. Click "Save All Settings" to update</p>
         </div>
 
-        <div class="form-group">
-            <label for="fajr-time">Fajr</label>
-            <input type="time" id="fajr-time" required>
+        <!-- Prayer Times Section -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-clock"></i> Prayer Times</h2>
+
+            <!-- Fajr -->
+            <div class="form-group">
+                <label for="fajr-time">Fajr (Begins)</label>
+                <input type="time" id="fajr-time" required>
+            </div>
+            <div class="form-group">
+                <label for="fajr-jamaat-time">Fajr (Jamaat)</label>
+                <input type="time" id="fajr-jamaat-time" required>
+            </div>
+
+            <!-- Sunrise -->
+            <div class="form-group">
+                <label for="sunrise-time">Sunrise</label>
+                <input type="time" id="sunrise-time" required>
+            </div>
+
+            <!-- Dhuhr -->
+            <div class="form-group">
+                <label for="dhuhr-time">Dhuhr (Begins)</label>
+                <input type="time" id="dhuhr-time" required>
+            </div>
+            <div class="form-group">
+                <label for="dhuhr-jamaat-time">Dhuhr (Jamaat)</label>
+                <input type="time" id="dhuhr-jamaat-time" required>
+            </div>
+
+            <!-- Asr -->
+            <div class="form-group">
+                <label for="asr-time">Asr (Begins)</label>
+                <input type="time" id="asr-time" required>
+            </div>
+            <div class="form-group">
+                <label for="asr-jamaat-time">Asr (Jamaat)</label>
+                <input type="time" id="asr-jamaat-time" required>
+            </div>
+
+            <!-- Maghrib -->
+            <div class="form-group">
+                <label for="maghrib-time">Maghrib (Begins)</label>
+                <input type="time" id="maghrib-time" required>
+            </div>
+            <div class="form-group">
+                <label for="maghrib-jamaat-time">Maghrib (Jamaat)</label>
+                <input type="time" id="maghrib-jamaat-time" required>
+            </div>
+
+            <!-- Isha -->
+            <div class="form-group">
+                <label for="isha-time">Isha (Begins)</label>
+                <input type="time" id="isha-time" required>
+            </div>
+            <div class="form-group">
+                <label for="isha-jamaat-time">Isha (Jamaat)</label>
+                <input type="time" id="isha-jamaat-time" required>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="sunrise-time">Sunrise</label>
-            <input type="time" id="sunrise-time" required>
+        <!-- Additional Prayers Section -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-pray"></i> Additional Prayers</h2>
+
+            <div class="toggle-container">
+                <span class="toggle-label">Enable Additional Prayers Display:</span>
+                <label class="switch">
+                    <input type="checkbox" id="additional-prayers-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div id="additional-prayers-container">
+                <div class="additional-prayer-item-container" id="additional-prayer-item-1-container">
+                    <div class="form-group">
+                        <label for="additional-prayer-name-1">Prayer Name</label>
+                        <input type="text" id="additional-prayer-name-1"
+                            placeholder="e.g., Jumu'ah, Sunrise, First Third">
+                    </div>
+                    <div class="form-group">
+                        <label for="additional-prayer-time-1">Prayer Time</label>
+                        <div class="input-with-button">
+                            <input type="time" id="additional-prayer-time-1">
+                            <button type="button" class="btn btn-danger remove-additional-prayer-btn" data-index="1"
+                                style="display: none;">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="add-additional-prayer-btn" class="btn btn-secondary" style="margin-top: 10px;">
+                <i class="fas fa-plus"></i> Add Additional Prayer
+            </button>
+        </div>
+        <!-- Hijri Date Section -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-calendar-alt"></i> Hijri Date Settings</h2>
+
+            <div class="form-group">
+                <label for="hijri-day">Hijri Day (1-30)</label>
+                <input type="number" id="hijri-day" min="1" max="30" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hijri-month">Hijri Month</label>
+                <input type="text" id="hijri-month" required>
+            </div>
+
+            <div class="form-group">
+                <label for="hijri-year">Hijri Year</label>
+                <input type="number" id="hijri-year" required>
+            </div>
+
+            <div class="form-group">
+                <label for="gregorian-date">Corresponding Gregorian Date</label>
+                <input type="date" id="gregorian-date" required>
+            </div>
+
+            <button id="fetch-hijri-btn" class="btn btn-primary">
+                <i class="fas fa-sync"></i> Fetch Current Hijri Date
+            </button>
         </div>
 
-        <div class="form-group">
-            <label for="dhuhr-time">Dhuhr</label>
-            <input type="time" id="dhuhr-time" required>
+        <!-- Khutbah Section -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-microphone"></i> Jumu'ah Khutbah</h2>
+
+            <div class="toggle-container">
+                <span class="toggle-label">Enable Khutbah Display:</span>
+                <label class="switch">
+                    <input type="checkbox" id="khutbah-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="khutbah-title">Khutbah Title</label>
+                <input type="text" id="khutbah-title" placeholder="Enter khutbah title">
+            </div>
+
+            <div class="form-group">
+                <label for="khutbah-summary">Khutbah Summary</label>
+                <textarea id="khutbah-summary" placeholder="Enter khutbah summary"></textarea>
+            </div>
+
+            <div class="form-group">
+                <label for="khutbah-speaker">Speaker Name</label>
+                <input type="text" id="khutbah-speaker" placeholder="Enter speaker's name">
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="asr-time">Asr</label>
-            <input type="time" id="asr-time" required>
+        <!-- QR Code Section -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-qrcode"></i> QR Code Settings</h2>
+
+            <div class="toggle-container">
+                <span class="toggle-label">Enable QR Code Display:</span>
+                <label class="switch">
+                    <input type="checkbox" id="qrcode-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label for="qrcode-url">QR Code URL</label>
+                <input type="text" id="qrcode-url" placeholder="Enter URL for QR code">
+            </div>
+
+            <div class="form-group">
+                <label for="qrcode-description">QR Code Description</label>
+                <textarea id="qrcode-description" placeholder="Enter description for the QR code"></textarea>
+            </div>
+
+            <div id="qrcode-preview" class="qr-preview">
+                <img id="qrcode-image" src="" alt="QR Code Preview" style="max-width: 100%;">
+            </div>
         </div>
 
-        <div class="form-group">
-            <label for="maghrib-time">Maghrib</label>
-            <input type="time" id="maghrib-time" required>
-        </div>
+        <!-- News Section -->
+        <div class="section">
+            <h2 class="section-title"><i class="fas fa-newspaper"></i> News Settings</h2>
 
-        <div class="form-group">
-            <label for="isha-time">Isha</label>
-            <input type="time" id="isha-time" required>
+            <div class="toggle-container">
+                <span class="toggle-label">Enable News Display:</span>
+                <label class="switch">
+                    <input type="checkbox" id="news-toggle">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div id="news-container">
+                <div class="news-item-container" id="news-item-1-container">
+                    <div class="form-group">
+                        <label for="news-item-1">News Item 1</label>
+                        <div class="input-with-button">
+                            <input type="text" id="news-item-1" placeholder="Enter news item">
+                            <button type="button" class="btn btn-danger remove-news-btn" data-index="1"
+                                style="display: none;">
+                                <i class="fas fa-minus"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <button type="button" id="add-news-btn" class="btn btn-secondary" style="margin-top: 10px;">
+                <i class="fas fa-plus"></i> Add News Item
+            </button>
         </div>
 
         <button id="save-btn" class="btn btn-primary">
-            <i class="fas fa-save"></i> Save Prayer Times
+            <i class="fas fa-save"></i> Save All Settings
         </button>
 
         <div id="status-message" class="status-message"></div>
@@ -221,61 +534,542 @@
         // DOM elements
         const saveBtn = document.getElementById('save-btn');
         const statusMessage = document.getElementById('status-message');
+        const fetchHijriBtn = document.getElementById('fetch-hijri-btn');
+
+        // Prayer time inputs
         const prayerInputs = {
-            fajr: document.getElementById('fajr-time'),
-            sunrise: document.getElementById('sunrise-time'),
-            dhuhr: document.getElementById('dhuhr-time'),
-            asr: document.getElementById('asr-time'),
-            maghrib: document.getElementById('maghrib-time'),
-            isha: document.getElementById('isha-time')
+            fajr: {
+                begins: document.getElementById('fajr-time'),
+                jamaat: document.getElementById('fajr-jamaat-time')
+            },
+            sunrise: {
+                begins: document.getElementById('sunrise-time'),
+                jamaat: null // Sunrise doesn't have Jamaat
+            },
+            dhuhr: {
+                begins: document.getElementById('dhuhr-time'),
+                jamaat: document.getElementById('dhuhr-jamaat-time')
+            },
+            asr: {
+                begins: document.getElementById('asr-time'),
+                jamaat: document.getElementById('asr-jamaat-time')
+            },
+            maghrib: {
+                begins: document.getElementById('maghrib-time'),
+                jamaat: document.getElementById('maghrib-jamaat-time')
+            },
+            isha: {
+                begins: document.getElementById('isha-time'),
+                jamaat: document.getElementById('isha-jamaat-time')
+            }
         };
 
-        // Load current times on page load
+        // Hijri date inputs
+        const hijriInputs = {
+            day: document.getElementById('hijri-day'),
+            month: document.getElementById('hijri-month'),
+            year: document.getElementById('hijri-year'),
+            gregorianDate: document.getElementById('gregorian-date')
+        };
+
+        // Khutbah inputs
+        const khutbahInputs = {
+            toggle: document.getElementById('khutbah-toggle'),
+            title: document.getElementById('khutbah-title'),
+            summary: document.getElementById('khutbah-summary'),
+            speaker: document.getElementById('khutbah-speaker')
+        };
+
+        // QR code inputs
+        const qrcodeInputs = {
+            toggle: document.getElementById('qrcode-toggle'),
+            url: document.getElementById('qrcode-url'),
+            description: document.getElementById('qrcode-description')
+        };
+        const qrPreview = document.getElementById('qrcode-preview');
+        const qrImage = document.getElementById('qrcode-image');
+
+        // News elements
+        const newsToggle = document.getElementById('news-toggle');
+        const newsContainer = document.getElementById('news-container');
+        const addNewsBtn = document.getElementById('add-news-btn');
+        let newsCount = 1;
+
+        // News inputs (will be populated dynamically)
+        const newsInputs = {};
+
+        // Additional prayers elements
+        const additionalPrayersToggle = document.getElementById('additional-prayers-toggle');
+        const additionalPrayersContainer = document.getElementById('additional-prayers-container');
+        const addAdditionalPrayerBtn = document.getElementById('add-additional-prayer-btn');
+        let additionalPrayersCount = 1;
+
+        // Load current settings on page load
         document.addEventListener('DOMContentLoaded', () => {
-            loadCurrentTimes();
+            loadCurrentSettings();
+            initNewsItems(); // Add this line
+            initAdditionalPrayerItems(); // Add this line
+            // Generate QR code preview when URL changes
+            qrcodeInputs.url.addEventListener('input', generateQRCodePreview);
         });
 
-        // Load current times from Firestore
-        function loadCurrentTimes() {
-            db.collection("prayerTimes").doc("currentTimes").get()
+        // Fetch current Hijri date from API
+        fetchHijriBtn.addEventListener('click', () => {
+            fetchHijriDate();
+        });
+
+        // Load current settings from Firestore
+        function loadCurrentSettings() {
+            db.collection("mosqueSettings").doc("currentSettings").get()
                 .then(doc => {
                     if (doc.exists) {
                         const data = doc.data();
-                        for (const key in prayerInputs) {
-                            if (data[key]) {
-                                prayerInputs[key].value = data[key];
+
+                        // Load prayer times
+                        if (data.prayerTimes) {
+                            for (const key in prayerInputs) {
+                                if (data.prayerTimes[key]) {
+                                    // Set begins time
+                                    if (prayerInputs[key].begins) {
+                                        prayerInputs[key].begins.value = data.prayerTimes[key].begins || '';
+                                    }
+
+                                    // Set jamaat time if it exists
+                                    if (prayerInputs[key].jamaat && data.prayerTimes[key].jamaat) {
+                                        prayerInputs[key].jamaat.value = data.prayerTimes[key].jamaat || '';
+                                    }
+                                }
                             }
                         }
-                        showStatus("Current times loaded successfully", "success");
+
+                        // Load hijri date
+                        if (data.hijriDate) {
+                            hijriInputs.day.value = data.hijriDate.day || '';
+                            hijriInputs.month.value = data.hijriDate.month || '';
+                            hijriInputs.year.value = data.hijriDate.year || '';
+                            hijriInputs.gregorianDate.value = data.hijriDate.gregorianDate || '';
+                        }
+
+                        // Load khutbah settings
+                        if (data.khutbah) {
+                            khutbahInputs.toggle.checked = data.khutbah.enabled || false;
+                            khutbahInputs.title.value = data.khutbah.title || '';
+                            khutbahInputs.summary.value = data.khutbah.summary || '';
+                            khutbahInputs.speaker.value = data.khutbah.speaker || '';
+                        }
+
+                        // Load QR code settings
+                        if (data.qrcode) {
+                            qrcodeInputs.toggle.checked = data.qrcode.enabled || false;
+                            qrcodeInputs.url.value = data.qrcode.url || '';
+                            qrcodeInputs.description.value = data.qrcode.description || '';
+
+                            if (data.qrcode.url) {
+                                generateQRCodePreview();
+                            }
+                        }
+                        // Load news settings
+                        if (data.news) {
+                            newsToggle.checked = data.news.enabled || false;
+
+                            // Clear existing news items
+                            while (newsContainer.children.length > 1) {
+                                newsContainer.removeChild(newsContainer.lastChild);
+                            }
+
+                            // Add news items based on saved data
+                            let itemCount = 0;
+                            for (let i = 1; i <= 4; i++) {
+                                if (data.news[`item${i}`]) {
+                                    if (i > 1) {
+                                        addNewsItem();
+                                    }
+                                    document.getElementById(`news-item-${i}`).value = data.news[`item${i}`];
+                                    itemCount++;
+                                }
+                            }
+
+                            newsCount = Math.max(1, itemCount);
+
+                            // Show/hide remove button for first item
+                            const firstRemoveBtn = document.querySelector('.remove-news-btn[data-index="1"]');
+                            if (firstRemoveBtn) {
+                                firstRemoveBtn.style.display = newsCount > 1 ? 'block' : 'none';
+                            }
+
+                            // Enable/disable add button
+                            addNewsBtn.disabled = newsCount >= 4;
+                        }
+
+                        // Load additional prayers settings
+                        if (data.additionalPrayers) {
+                            additionalPrayersToggle.checked = data.additionalPrayers.enabled || false;
+
+                            // Clear existing additional prayer items except the first one
+                            while (additionalPrayersContainer.children.length > 1) {
+                                additionalPrayersContainer.removeChild(additionalPrayersContainer.lastChild);
+                            }
+
+                            // Add additional prayer items based on saved data
+                            let itemCount = 0;
+                            if (data.additionalPrayers.items && data.additionalPrayers.items.length > 0) {
+                                data.additionalPrayers.items.forEach((item, index) => {
+                                    if (index > 0) {
+                                        addAdditionalPrayerItem();
+                                    }
+
+                                    document.getElementById(`additional-prayer-name-${index + 1}`).value = item.name || '';
+                                    document.getElementById(`additional-prayer-time-${index + 1}`).value = item.time || '';
+                                    itemCount++;
+                                });
+                            }
+
+                            additionalPrayersCount = Math.max(1, itemCount);
+
+                            // Show/hide remove button for first item
+                            const firstRemoveBtn = document.querySelector('.remove-additional-prayer-btn[data-index="1"]');
+                            if (firstRemoveBtn) {
+                                firstRemoveBtn.style.display = additionalPrayersCount > 1 ? 'block' : 'none';
+                            }
+
+                            // Enable/disable add button
+                            addAdditionalPrayerBtn.disabled = additionalPrayersCount >= 4;
+                        }
+                        showStatus("Current settings loaded successfully", "success");
                     } else {
-                        showStatus("No existing times found. Set new times.", "error");
+                        showStatus("No existing settings found. Configure new settings.", "error");
                     }
                 })
                 .catch(error => {
-                    console.error("Error loading prayer times:", error);
-                    showStatus("Error loading times. Please try again.", "error");
+                    console.error("Error loading settings:", error);
+                    showStatus("Error loading settings. Please try again.", "error");
                 });
         }
 
-        // Save times to Firestore
+        // Add news item
+        function addNewsItem() {
+            if (newsCount >= 4) {
+                addNewsBtn.disabled = true;
+                return;
+            }
+
+            newsCount++;
+            const newItem = document.createElement('div');
+            newItem.className = 'news-item-container';
+            newItem.id = `news-item-${newsCount}-container`;
+            newItem.innerHTML = `
+        <div class="form-group">
+            <label for="news-item-${newsCount}">News Item ${newsCount}</label>
+            <div class="input-with-button">
+                <input type="text" id="news-item-${newsCount}" placeholder="Enter news item">
+                <button type="button" class="btn btn-danger remove-news-btn" data-index="${newsCount}">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+    `;
+
+            newsContainer.appendChild(newItem);
+
+            // Add event listener to the remove button
+            const removeBtn = newItem.querySelector('.remove-news-btn');
+            removeBtn.addEventListener('click', function () {
+                removeNewsItem(this.dataset.index);
+            });
+
+            // Show the first remove button if we have more than 1 item
+            if (newsCount === 2) {
+                document.querySelector('.remove-news-btn[data-index="1"]').style.display = 'block';
+            }
+        }
+
+        // Add additional prayer item
+        function addAdditionalPrayerItem() {
+            if (additionalPrayersCount >= 4) {
+                addAdditionalPrayerBtn.disabled = true;
+                return;
+            }
+
+            additionalPrayersCount++;
+            const newItem = document.createElement('div');
+            newItem.className = 'additional-prayer-item-container';
+            newItem.id = `additional-prayer-item-${additionalPrayersCount}-container`;
+            newItem.innerHTML = `
+        <div class="form-group">
+            <label for="additional-prayer-name-${additionalPrayersCount}">Prayer Name</label>
+            <input type="text" id="additional-prayer-name-${additionalPrayersCount}" placeholder="e.g., Jumu'ah, Sunrise, First Third">
+        </div>
+        <div class="form-group">
+            <label for="additional-prayer-time-${additionalPrayersCount}">Prayer Time</label>
+            <div class="input-with-button">
+                <input type="time" id="additional-prayer-time-${additionalPrayersCount}">
+                <button type="button" class="btn btn-danger remove-additional-prayer-btn" data-index="${additionalPrayersCount}">
+                    <i class="fas fa-minus"></i>
+                </button>
+            </div>
+        </div>
+    `;
+
+            additionalPrayersContainer.appendChild(newItem);
+
+            // Add event listener to the remove button
+            const removeBtn = newItem.querySelector('.remove-additional-prayer-btn');
+            removeBtn.addEventListener('click', function () {
+                removeAdditionalPrayerItem(this.dataset.index);
+            });
+
+            // Show the first remove button if we have more than 1 item
+            if (additionalPrayersCount === 2) {
+                document.querySelector('.remove-additional-prayer-btn[data-index="1"]').style.display = 'block';
+            }
+        }
+
+        // Remove additional prayer item
+        function removeAdditionalPrayerItem(index) {
+            const itemToRemove = document.getElementById(`additional-prayer-item-${index}-container`);
+            if (itemToRemove) {
+                itemToRemove.remove();
+                additionalPrayersCount--;
+
+                // Renumber remaining items
+                const items = additionalPrayersContainer.querySelectorAll('.additional-prayer-item-container');
+                items.forEach((item, i) => {
+                    const newIndex = i + 1;
+                    item.id = `additional-prayer-item-${newIndex}-container`;
+
+                    // Update name input
+                    const nameInput = item.querySelector('input[type="text"]');
+                    const nameLabel = item.querySelector('label[for^="additional-prayer-name-"]');
+                    nameInput.id = `additional-prayer-name-${newIndex}`;
+                    nameLabel.htmlFor = `additional-prayer-name-${newIndex}`;
+                    nameLabel.textContent = 'Prayer Name';
+
+                    // Update time input
+                    const timeInput = item.querySelector('input[type="time"]');
+                    const timeLabel = item.querySelector('label[for^="additional-prayer-time-"]');
+                    timeInput.id = `additional-prayer-time-${newIndex}`;
+                    timeLabel.htmlFor = `additional-prayer-time-${newIndex}`;
+                    timeLabel.textContent = 'Prayer Time';
+
+                    // Update remove button
+                    const removeBtn = item.querySelector('.remove-additional-prayer-btn');
+                    removeBtn.dataset.index = newIndex;
+                });
+
+                // Enable add button if we have less than 4 items
+                if (additionalPrayersCount < 4) {
+                    addAdditionalPrayerBtn.disabled = false;
+                }
+
+                // Hide remove button if we have only 1 item
+                if (additionalPrayersCount === 1) {
+                    document.querySelector('.remove-additional-prayer-btn[data-index="1"]').style.display = 'none';
+                }
+            }
+        }
+
+        // Initialize additional prayer items
+        function initAdditionalPrayerItems() {
+            // Add event listener to the add button
+            addAdditionalPrayerBtn.addEventListener('click', addAdditionalPrayerItem);
+
+            // Add event listener to the first remove button
+            const firstRemoveBtn = document.querySelector('.remove-additional-prayer-btn[data-index="1"]');
+            if (firstRemoveBtn) {
+                firstRemoveBtn.addEventListener('click', function () {
+                    removeAdditionalPrayerItem(this.dataset.index);
+                });
+            }
+        }
+
+        // Remove news item
+        function removeNewsItem(index) {
+            const itemToRemove = document.getElementById(`news-item-${index}-container`);
+            if (itemToRemove) {
+                itemToRemove.remove();
+                delete newsInputs[`item${index}`];
+                newsCount--;
+
+                // Renumber remaining items
+                const items = newsContainer.querySelectorAll('.news-item-container');
+                items.forEach((item, i) => {
+                    const newIndex = i + 1;
+                    item.id = `news-item-${newIndex}-container`;
+                    const label = item.querySelector('label');
+                    const input = item.querySelector('input');
+                    const removeBtn = item.querySelector('.remove-news-btn');
+
+                    label.htmlFor = `news-item-${newIndex}`;
+                    label.textContent = `News Item ${newIndex}`;
+                    input.id = `news-item-${newIndex}`;
+                    removeBtn.dataset.index = newIndex;
+
+                    // Update the newsInputs object
+                    if (input.value) {
+                        newsInputs[`item${newIndex}`] = input.value;
+                    }
+                });
+
+                // Enable add button if we have less than 4 items
+                if (newsCount < 4) {
+                    addNewsBtn.disabled = false;
+                }
+
+                // Hide remove button if we have only 1 item
+                if (newsCount === 1) {
+                    document.querySelector('.remove-news-btn[data-index="1"]').style.display = 'none';
+                }
+            }
+        }
+
+        // Initialize news items
+        function initNewsItems() {
+            // Add event listener to the add button
+            addNewsBtn.addEventListener('click', addNewsItem);
+
+            // Add event listener to the first remove button
+            const firstRemoveBtn = document.querySelector('.remove-news-btn[data-index="1"]');
+            if (firstRemoveBtn) {
+                firstRemoveBtn.addEventListener('click', function () {
+                    removeNewsItem(this.dataset.index);
+                });
+            }
+        }
+
+        // Fetch Hijri date from API
+        function fetchHijriDate() {
+            fetchHijriBtn.innerHTML = '<div class="loading"></div> Fetching...';
+            fetchHijriBtn.disabled = true;
+
+            // Using Aladhan API to get current Hijri date
+            fetch('http://api.aladhan.com/v1/gToH')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200) {
+                        const hijri = data.data.hijri;
+                        hijriInputs.day.value = hijri.day;
+                        hijriInputs.month.value = hijri.month.en;
+                        hijriInputs.year.value = hijri.year;
+                        hijriInputs.gregorianDate.value = new Date().toISOString().split('T')[0];
+
+                        showStatus("Hijri date fetched successfully", "success");
+                    } else {
+                        showStatus("Failed to fetch Hijri date from API", "error");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching Hijri date:", error);
+                    showStatus("Error fetching Hijri date. Please try again.", "error");
+                })
+                .finally(() => {
+                    fetchHijriBtn.innerHTML = '<i class="fas fa-sync"></i> Fetch Current Hijri Date';
+                    fetchHijriBtn.disabled = false;
+                });
+        }
+
+        // Generate QR code preview
+        function generateQRCodePreview() {
+            const url = qrcodeInputs.url.value;
+            if (url) {
+                // Using Google Charts API to generate QR code
+                qrImage.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(url)}&choe=UTF-8`;
+                qrPreview.style.display = 'block';
+            } else {
+                qrPreview.style.display = 'none';
+            }
+        }
+
+        // Save all settings to Firestore
         saveBtn.addEventListener('click', () => {
-            const prayerTimes = {};
+            const settings = {};
             let isValid = true;
 
-            // Collect values and validate
+            // Collect prayer times
+            settings.prayerTimes = {};
             for (const key in prayerInputs) {
-                if (!prayerInputs[key].value) {
+                if (!prayerInputs[key].begins.value) {
                     isValid = false;
-                    prayerInputs[key].style.borderColor = "red";
+                    prayerInputs[key].begins.style.borderColor = "red";
                 } else {
-                    prayerTimes[key] = prayerInputs[key].value;
-                    prayerInputs[key].style.borderColor = "";
+                    settings.prayerTimes[key] = {
+                        begins: prayerInputs[key].begins.value
+                    };
+                    prayerInputs[key].begins.style.borderColor = "";
+
+                    // Add jamaat time if it exists (and for prayers that have jamaat)
+                    if (prayerInputs[key].jamaat && prayerInputs[key].jamaat.value && key !== 'sunrise') {
+                        settings.prayerTimes[key].jamaat = prayerInputs[key].jamaat.value;
+                    }
                 }
             }
 
+            // Collect hijri date
+            settings.hijriDate = {
+                day: hijriInputs.day.value,
+                month: hijriInputs.month.value,
+                year: hijriInputs.year.value,
+                gregorianDate: hijriInputs.gregorianDate.value
+            };
+
+            if (!hijriInputs.day.value || !hijriInputs.month.value ||
+                !hijriInputs.year.value || !hijriInputs.gregorianDate.value) {
+                isValid = false;
+                Object.values(hijriInputs).forEach(input => {
+                    if (!input.value) input.style.borderColor = "red";
+                });
+            } else {
+                Object.values(hijriInputs).forEach(input => input.style.borderColor = "");
+            }
+
+            // Collect khutbah settings
+            settings.khutbah = {
+                enabled: khutbahInputs.toggle.checked,
+                title: khutbahInputs.title.value,
+                summary: khutbahInputs.summary.value,
+                speaker: khutbahInputs.speaker.value
+            };
+
+            // Collect QR code settings
+            settings.qrcode = {
+                enabled: qrcodeInputs.toggle.checked,
+                url: qrcodeInputs.url.value,
+                description: qrcodeInputs.description.value
+            };
+
             if (!isValid) {
-                showStatus("Please fill all prayer times", "error");
+                showStatus("Please fill all required fields", "error");
                 return;
+            }
+            // Collect news items
+            settings.news = {
+                enabled: newsToggle.checked
+            };
+
+            // Get values from all news inputs
+            for (let i = 1; i <= newsCount; i++) {
+                const input = document.getElementById(`news-item-${i}`);
+                if (input && input.value) {
+                    settings.news[`item${i}`] = input.value;
+                }
+            }
+
+            // Collect additional prayers
+            settings.additionalPrayers = {
+                enabled: additionalPrayersToggle.checked,
+                items: []
+            };
+
+            // Get values from all additional prayer inputs
+            for (let i = 1; i <= additionalPrayersCount; i++) {
+                const nameInput = document.getElementById(`additional-prayer-name-${i}`);
+                const timeInput = document.getElementById(`additional-prayer-time-${i}`);
+
+                if (nameInput && timeInput && nameInput.value && timeInput.value) {
+                    settings.additionalPrayers.items.push({
+                        name: nameInput.value,
+                        time: timeInput.value
+                    });
+                }
             }
 
             // Show loading state
@@ -283,16 +1077,16 @@
             saveBtn.disabled = true;
 
             // Save to Firestore
-            db.collection("prayerTimes").doc("currentTimes").set(prayerTimes)
+            db.collection("mosqueSettings").doc("currentSettings").set(settings)
                 .then(() => {
-                    showStatus("Prayer times saved successfully!", "success");
+                    showStatus("All settings saved successfully!", "success");
                 })
                 .catch(error => {
-                    console.error("Error saving prayer times:", error);
-                    showStatus("Error saving times. Please try again.", "error");
+                    console.error("Error saving settings:", error);
+                    showStatus("Error saving settings. Please try again.", "error");
                 })
                 .finally(() => {
-                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save Prayer Times';
+                    saveBtn.innerHTML = '<i class="fas fa-save"></i> Save All Settings';
                     saveBtn.disabled = false;
                 });
         });
