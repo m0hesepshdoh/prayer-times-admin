@@ -34,7 +34,7 @@
         }
 
         .container {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
             background: white;
             border-radius: 10px;
@@ -55,8 +55,39 @@
             margin-bottom: 10px;
         }
 
+        .prayer-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .prayer-row label {
+            width: 100px;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+
+        .time-inputs {
+            display: flex;
+            gap: 15px;
+            flex: 1;
+        }
+
+        .time-input {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .time-label {
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+            color: #555;
+        }
+
         .form-group {
             margin-bottom: 20px;
+            flex: 1;
         }
 
         label {
@@ -69,12 +100,15 @@
         input[type="time"],
         input[type="text"],
         textarea {
-            width: 100%;
+            width: 40%;
             padding: 12px 15px;
             border: 1px solid #ddd;
             border-radius: 6px;
             font-size: 16px;
             transition: border 0.3s;
+            display: flex;
+            gap: 15px;
+            margin-top: 8px;
         }
 
         .additional-prayer-item-container {
@@ -301,59 +335,78 @@
             <h2 class="section-title"><i class="fas fa-clock"></i> Prayer Times</h2>
 
             <!-- Fajr -->
-            <div class="form-group">
-                <label for="fajr-time">Fajr (Begins)</label>
-                <input type="time" id="fajr-time" required>
-            </div>
-            <div class="form-group">
-                <label for="fajr-jamaat-time">Fajr (Jamaat)</label>
-                <input type="time" id="fajr-jamaat-time" required>
-            </div>
-
-            <!-- Sunrise -->
-            <div class="form-group">
-                <label for="sunrise-time">Sunrise</label>
-                <input type="time" id="sunrise-time" required>
+            <div class="form-group prayer-row">
+                <label for="fajr-time">Fajr</label>
+                <div class="time-inputs">
+                    <div class="time-input">
+                        <span class="time-label">Begins</span>
+                        <input type="time" id="fajr-time" required>
+                    </div>
+                    <div class="time-input">
+                        <span class="time-label">Jamaat</span>
+                        <input type="time" id="fajr-jamaat-time" required>
+                    </div>
+                </div>
             </div>
 
             <!-- Dhuhr -->
-            <div class="form-group">
-                <label for="dhuhr-time">Dhuhr (Begins)</label>
-                <input type="time" id="dhuhr-time" required>
-            </div>
-            <div class="form-group">
-                <label for="dhuhr-jamaat-time">Dhuhr (Jamaat)</label>
-                <input type="time" id="dhuhr-jamaat-time" required>
+            <div class="form-group prayer-row">
+                <label for="dhuhr-time">Dhuhr</label>
+                <div class="time-inputs">
+                    <div class="time-input">
+                        <span class="time-label">Begins</span>
+                        <input type="time" id="dhuhr-time" required>
+                    </div>
+                    <div class="time-input">
+                        <span class="time-label">Jamaat</span>
+                        <input type="time" id="dhuhr-jamaat-time" required>
+                    </div>
+                </div>
             </div>
 
             <!-- Asr -->
-            <div class="form-group">
-                <label for="asr-time">Asr (Begins)</label>
-                <input type="time" id="asr-time" required>
-            </div>
-            <div class="form-group">
-                <label for="asr-jamaat-time">Asr (Jamaat)</label>
-                <input type="time" id="asr-jamaat-time" required>
+            <div class="form-group prayer-row">
+                <label for="asr-time">Asr</label>
+                <div class="time-inputs">
+                    <div class="time-input">
+                        <span class="time-label">Begins</span>
+                        <input type="time" id="asr-time" required>
+                    </div>
+                    <div class="time-input">
+                        <span class="time-label">Jamaat</span>
+                        <input type="time" id="asr-jamaat-time" required>
+                    </div>
+                </div>
             </div>
 
             <!-- Maghrib -->
-            <div class="form-group">
-                <label for="maghrib-time">Maghrib (Begins)</label>
-                <input type="time" id="maghrib-time" required>
-            </div>
-            <div class="form-group">
-                <label for="maghrib-jamaat-time">Maghrib (Jamaat)</label>
-                <input type="time" id="maghrib-jamaat-time" required>
+            <div class="form-group prayer-row">
+                <label for="maghrib-time">Maghrib</label>
+                <div class="time-inputs">
+                    <div class="time-input">
+                        <span class="time-label">Begins</span>
+                        <input type="time" id="maghrib-time" required>
+                    </div>
+                    <div class="time-input">
+                        <span class="time-label">Jamaat</span>
+                        <input type="time" id="maghrib-jamaat-time" required>
+                    </div>
+                </div>
             </div>
 
             <!-- Isha -->
-            <div class="form-group">
-                <label for="isha-time">Isha (Begins)</label>
-                <input type="time" id="isha-time" required>
-            </div>
-            <div class="form-group">
-                <label for="isha-jamaat-time">Isha (Jamaat)</label>
-                <input type="time" id="isha-jamaat-time" required>
+            <div class="form-group prayer-row">
+                <label for="isha-time">Isha</label>
+                <div class="time-inputs">
+                    <div class="time-input">
+                        <span class="time-label">Begins</span>
+                        <input type="time" id="isha-time" required>
+                    </div>
+                    <div class="time-input">
+                        <span class="time-label">Jamaat</span>
+                        <input type="time" id="isha-jamaat-time" required>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -542,10 +595,7 @@
                 begins: document.getElementById('fajr-time'),
                 jamaat: document.getElementById('fajr-jamaat-time')
             },
-            sunrise: {
-                begins: document.getElementById('sunrise-time'),
-                jamaat: null // Sunrise doesn't have Jamaat
-            },
+
             dhuhr: {
                 begins: document.getElementById('dhuhr-time'),
                 jamaat: document.getElementById('dhuhr-jamaat-time')
@@ -997,7 +1047,7 @@
                     prayerInputs[key].begins.style.borderColor = "";
 
                     // Add jamaat time if it exists (and for prayers that have jamaat)
-                    if (prayerInputs[key].jamaat && prayerInputs[key].jamaat.value && key !== 'sunrise') {
+                    if (prayerInputs[key].jamaat && prayerInputs[key].jamaat.value) {
                         settings.prayerTimes[key].jamaat = prayerInputs[key].jamaat.value;
                     }
                 }
