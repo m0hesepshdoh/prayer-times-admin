@@ -1022,7 +1022,7 @@
             const url = qrcodeInputs.url.value;
             if (url) {
                 // Using Google Charts API to generate QR code
-                qrImage.src = `https://chart.googleapis.com/chart?chs=200x200&cht=qr&chl=${encodeURIComponent(url)}&choe=UTF-8`;
+                qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
                 qrPreview.style.display = 'block';
             } else {
                 qrPreview.style.display = 'none';
