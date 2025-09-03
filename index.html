@@ -992,7 +992,7 @@
             fetchHijriBtn.disabled = true;
 
             // Using Aladhan API to get current Hijri date
-            fetch('http://api.aladhan.com/v1/gToH')
+            fetch('https://api.aladhan.com/v1/gToH')
                 .then(response => response.json())
                 .then(data => {
                     if (data.code === 200) {
