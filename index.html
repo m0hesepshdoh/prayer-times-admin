@@ -560,6 +560,16 @@
             <button type="button" id="add-news-btn" class="btn btn-secondary" style="margin-top: 10px;">
                 <i class="fas fa-plus"></i> Add News Item
             </button>
+
+            <!-- Notice Messages Section -->
+            <div class="section">
+                <h2 class="section-title"><i class="fas fa-bullhorn"></i> Notice Messages</h2>
+
+                <div class="form-group">
+                    <label for="notice-messages">Notice Messages (separated by commas)</label>
+                    <textarea id="notice-messages" placeholder="Enter notice messages separated by commas"></textarea>
+                </div>
+            </div>
         </div>
 
         <button id="save-btn" class="btn btn-primary">
@@ -750,7 +760,7 @@
                             // Enable/disable add button
                             addNewsBtn.disabled = newsCount >= 4;
                         }
-
+                        
                         // Load additional prayers settings
                         if (data.additionalPrayers) {
                             additionalPrayersToggle.checked = data.additionalPrayers.enabled || false;
@@ -1028,7 +1038,8 @@
                 qrPreview.style.display = 'none';
             }
         }
-
+        // Add to the settings object before saving
+        settings.notices = document.getElementById('notice-messages').value || '';
         // Save all settings to Firestore
         saveBtn.addEventListener('click', () => {
             const settings = {};
