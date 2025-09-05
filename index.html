@@ -728,6 +728,10 @@
                                 generateQRCodePreview();
                             }
                         }
+                        // Load notice messages
+                        if (data.notices) {
+                            document.getElementById('notice-messages').value = data.notices || '';
+                        }
                         // Load news settings
                         if (data.news) {
                             newsToggle.checked = data.news.enabled || false;
@@ -760,7 +764,7 @@
                             // Enable/disable add button
                             addNewsBtn.disabled = newsCount >= 4;
                         }
-                        
+
                         // Load additional prayers settings
                         if (data.additionalPrayers) {
                             additionalPrayersToggle.checked = data.additionalPrayers.enabled || false;
@@ -1038,8 +1042,6 @@
                 qrPreview.style.display = 'none';
             }
         }
-        // Add to the settings object before saving
-        settings.notices = document.getElementById('notice-messages').value || '';
         // Save all settings to Firestore
         saveBtn.addEventListener('click', () => {
             const settings = {};
@@ -1101,6 +1103,10 @@
                 showStatus("Please fill all required fields", "error");
                 return;
             }
+
+            // collect notice messages
+            settings.notices = document.getElementById('notice-messages').value || '';
+
             // Collect news items
             settings.news = {
                 enabled: newsToggle.checked
