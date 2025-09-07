@@ -517,7 +517,12 @@
 
             <div class="form-group">
                 <label for="qrcode-url">QR Code URL</label>
-                <input type="text" id="qrcode-url" placeholder="Enter URL for QR code">
+                <div class="input-with-button">
+                    <input type="text" id="qrcode-url" placeholder="Enter URL for QR code">
+                    <button type="button" id="scan-qr-btn" class="btn btn-secondary">
+                        <i class="fas fa-camera"></i> Scan QR Code
+                    </button>
+                </div>
             </div>
 
             <div class="form-group">
@@ -527,6 +532,33 @@
 
             <div id="qrcode-preview" class="qr-preview">
                 <img id="qrcode-image" src="" alt="QR Code Preview" style="max-width: 100%;">
+            </div>
+
+            <!-- QR Code Scanner Modal -->
+            <div id="qr-scanner-modal"
+                style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); z-index: 1000;">
+                <div
+                    style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; width: 90%; max-width: 500px;">
+                    <h3 style="margin-bottom: 15px;">Scan QR Code</h3>
+                    <div style="display: flex; flex-direction: column; gap: 15px;">
+                        <div
+                            style="position: relative; width: 100%; padding-bottom: 100%; background: #000; overflow: hidden;">
+                            <video id="qr-video"
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover;"></video>
+                            <div id="qr-scanner-overlay"
+                                style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 2px solid #3498db; box-sizing: border-box;">
+                            </div>
+                        </div>
+                        <p style="text-align: center; margin: 0;">Or upload an image:</p>
+                        <input type="file" id="qr-file-input" accept="image/*" style="margin-bottom: 10px;">
+                        <div style="display: flex; gap: 10px; justify-content: center;">
+                            <button id="close-scanner-btn" class="btn btn-secondary">Cancel</button>
+                            <button id="switch-camera-btn" class="btn btn-secondary" style="display: none;">
+                                <i class="fas fa-sync-alt"></i> Switch Camera
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -648,6 +680,14 @@
         };
         const qrPreview = document.getElementById('qrcode-preview');
         const qrImage = document.getElementById('qrcode-image');
+        const scanQrBtn = document.getElementById('scan-qr-btn');
+        const qrScannerModal = document.getElementById('qr-scanner-modal');
+        const closeScannerBtn = document.getElementById('close-scanner-btn');
+        const switchCameraBtn = document.getElementById('switch-camera-btn');
+        const qrVideo = document.getElementById('qr-video');
+        const qrFileInput = document.getElementById('qr-file-input');
+        let qrScanner = null;
+        let currentFacingMode = 'environment';
 
         // News elements
         const newsToggle = document.getElementById('news-toggle');
@@ -669,6 +709,7 @@
             loadCurrentSettings();
             initNewsItems(); // Add this line
             initAdditionalPrayerItems(); // Add this line
+            initQRScanner();
             // Generate QR code preview when URL changes
             qrcodeInputs.url.addEventListener('input', generateQRCodePreview);
         });
@@ -1042,6 +1083,7 @@
                 qrPreview.style.display = 'none';
             }
         }
+
         // Save all settings to Firestore
         saveBtn.addEventListener('click', () => {
             const settings = {};
@@ -1157,6 +1199,203 @@
                     saveBtn.disabled = false;
                 });
         });
+
+        // Initialize QR scanner
+        function initQRScanner() {
+            // Check if jsQR is already loaded, if not load it
+            if (typeof jsQR === 'undefined') {
+                const script = document.createElement('script');
+                script.src = 'https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js';
+                script.onload = setupQRScanner;
+                document.head.appendChild(script);
+            } else {
+                setupQRScanner();
+            }
+        }
+
+        function setupQRScanner() {
+            // Add event listeners
+            scanQrBtn.addEventListener('click', openQRScanner);
+            closeScannerBtn.addEventListener('click', closeQRScanner);
+            switchCameraBtn.addEventListener('click', switchCamera);
+            qrFileInput.addEventListener('change', handleFileUpload);
+        }
+
+        function openQRScanner() {
+            qrScannerModal.style.display = 'block';
+            startQRScanning();
+        }
+
+        function closeQRScanner() {
+            qrScannerModal.style.display = 'none';
+            stopQRScanning();
+        }
+
+        function switchCamera() {
+            stopQRScanning();
+            currentFacingMode = currentFacingMode === 'environment' ? 'user' : 'environment';
+            startQRScanning();
+        }
+
+        function stopQRScanning() {
+            if (qrScanner && qrScanner.stream) {
+                qrScanner.stream.getTracks().forEach(track => track.stop());
+            }
+            if (qrScanner && qrScanner.canvas) {
+                const canvas = qrScanner.canvas;
+                canvas.width = canvas.height = 0;
+            }
+            qrScanner = null;
+        }
+
+        function startQRScanning() {
+            // Check if we can access the camera
+            navigator.mediaDevices.getUserMedia({
+                video: { facingMode: currentFacingMode }
+            }).then(function (stream) {
+                qrVideo.srcObject = stream;
+                qrVideo.setAttribute('playsinline', true); // required for iOS
+                qrVideo.play();
+
+                // Show switch camera button if multiple cameras are available
+                navigator.mediaDevices.enumerateDevices()
+                    .then(devices => {
+                        const videoDevices = devices.filter(device => device.kind === 'videoinput');
+                        switchCameraBtn.style.display = videoDevices.length > 1 ? 'block' : 'none';
+                    });
+
+                requestAnimationFrame(tick);
+            }).catch(function (err) {
+                console.error("Error accessing camera:", err);
+                showStatus("Cannot access camera. Please check permissions.", "error");
+            });
+        }
+
+        function tick() {
+            if (qrVideo.readyState === qrVideo.HAVE_ENOUGH_DATA) {
+                // Create canvas for processing if it doesn't exist
+                if (!qrScanner || !qrScanner.canvas) {
+                    qrScanner = qrScanner || {};
+                    qrScanner.canvas = document.createElement('canvas');
+                    qrScanner.canvasContext = qrScanner.canvas.getContext('2d');
+                }
+
+                // Set canvas dimensions to match video
+                qrScanner.canvas.width = qrVideo.videoWidth;
+                qrScanner.canvas.height = qrVideo.videoHeight;
+
+                // Draw video frame to canvas
+                qrScanner.canvasContext.drawImage(qrVideo, 0, 0, qrScanner.canvas.width, qrScanner.canvas.height);
+
+                // Get image data from canvas
+                const imageData = qrScanner.canvasContext.getImageData(0, 0, qrScanner.canvas.width, qrScanner.canvas.height);
+
+                // Try to decode QR code
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: 'dontInvert',
+                });
+
+                // If QR code found
+                if (code) {
+                    // Draw box around QR code for visual feedback
+                    drawQRBox(code.location);
+
+                    // Populate the URL field and close scanner
+                    document.getElementById('qrcode-url').value = code.data;
+                    generateQRCodePreview();
+                    setTimeout(closeQRScanner, 1000); // Close after a brief moment
+                    showStatus("QR code scanned successfully!", "success");
+                } else {
+                    // Continue scanning
+                    requestAnimationFrame(tick);
+                }
+            } else {
+                requestAnimationFrame(tick);
+            }
+        }
+
+        function drawQRBox(location) {
+            const overlay = document.getElementById('qr-scanner-overlay');
+            overlay.innerHTML = ''; // Clear previous boxes
+
+            // Draw box around QR code
+            const box = document.createElement('div');
+            box.style.position = 'absolute';
+            box.style.border = '2px solid #3498db';
+            box.style.boxSizing = 'border-box';
+
+            // Calculate position and size relative to video
+            const videoWidth = qrVideo.videoWidth;
+            const videoHeight = qrVideo.videoHeight;
+            const overlayWidth = overlay.offsetWidth;
+            const overlayHeight = overlay.offsetHeight;
+
+            const scaleX = overlayWidth / videoWidth;
+            const scaleY = overlayHeight / videoHeight;
+
+            // Find the min/max points of the QR code
+            const points = [
+                location.topLeftCorner,
+                location.topRightCorner,
+                location.bottomRightCorner,
+                location.bottomLeftCorner
+            ];
+
+            let minX = points[0].x;
+            let maxX = points[0].x;
+            let minY = points[0].y;
+            let maxY = points[0].y;
+
+            for (const point of points) {
+                minX = Math.min(minX, point.x);
+                maxX = Math.max(maxX, point.x);
+                minY = Math.min(minY, point.y);
+                maxY = Math.max(maxY, point.y);
+            }
+
+            // Set box position and dimensions
+            box.style.left = (minX * scaleX) + 'px';
+            box.style.top = (minY * scaleY) + 'px';
+            box.style.width = ((maxX - minX) * scaleX) + 'px';
+            box.style.height = ((maxY - minY) * scaleY) + 'px';
+
+            overlay.appendChild(box);
+        }
+
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const img = new Image();
+            img.onload = function () {
+                // Create canvas for processing
+                const canvas = document.createElement('canvas');
+                const context = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                context.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                // Get image data
+                const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+                // Try to decode QR code
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: 'dontInvert',
+                });
+
+                if (code) {
+                    // Populate the URL field
+                    document.getElementById('qrcode-url').value = code.data;
+                    generateQRCodePreview();
+                    closeQRScanner();
+                    showStatus("QR code scanned successfully!", "success");
+                } else {
+                    showStatus("No QR code found in the image", "error");
+                }
+            };
+
+            img.src = URL.createObjectURL(file);
+        }
 
         // Show status message
         function showStatus(message, type) {
