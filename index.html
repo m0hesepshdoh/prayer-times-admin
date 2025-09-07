@@ -7,6 +7,7 @@
     <title>Prayer Times Admin</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -688,6 +689,7 @@
         const qrFileInput = document.getElementById('qr-file-input');
         let qrScanner = null;
         let currentFacingMode = 'environment';
+        let stream = null;
 
         // News elements
         const newsToggle = document.getElementById('news-toggle');
