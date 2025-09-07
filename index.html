@@ -7,6 +7,7 @@
     <title>Prayer Times Admin</title>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         :root {
@@ -324,7 +325,7 @@
 
         <div class="instructions">
             <p><strong>Instructions:</strong></p>
-            <p>1. Enter prayer times in 24-hour format (HH:MM)</p>
+            <p>1. Enter prayer times in 12-hour format (HH:MM)</p>
             <p>2. Set up Hijri date, Khutbah details, and QR code information</p>
             <p>3. Toggle features on/off as needed</p>
             <p>4. Click "Save All Settings" to update</p>
@@ -1225,7 +1226,6 @@
         }
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
 </body>
 
 </html>
