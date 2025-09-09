@@ -520,8 +520,8 @@
             <div class="form-group">
                 <label for="qrcode-url">QR Code URL</label>
                 <div class="input-with-button">
-                    <input type="text" id="qrcode-url" placeholder="Enter URL for QR code">
-                    <button type="button" id="scan-qr-btn" class="btn btn-secondary">
+                    <textarea id="qrcode-text" placeholder="Enter text for QR code (supports newlines and spaces)"
+                        rows="4"></textarea> <button type="button" id="scan-qr-btn" class="btn btn-secondary">
                         <i class="fas fa-camera"></i> Scan QR
                     </button>
                 </div>
@@ -653,11 +653,12 @@
         // QR code inputs
         const qrcodeInputs = {
             toggle: document.getElementById('qrcode-toggle'),
-            url: document.getElementById('qrcode-url'),
+            text: document.getElementById('qrcode-text'),
             description: document.getElementById('qrcode-description')
         };
         const qrPreview = document.getElementById('qrcode-preview');
         const qrImage = document.getElementById('qrcode-image');
+
         // QR Code scanning functionality
         const scanQrBtn = document.getElementById('scan-qr-btn');
         const qrFileInput = document.getElementById('qr-file-input');
@@ -682,8 +683,8 @@
             loadCurrentSettings();
             initNewsItems(); // Add this line
             initAdditionalPrayerItems(); // Add this line
-            // Generate QR code preview when URL changes
-            qrcodeInputs.url.addEventListener('input', generateQRCodePreview);
+            // Generate QR code preview when text changes
+            qrcodeInputs.text.addEventListener('input', generateQRCodePreview);
         });
 
         // Fetch current Hijri date from API
@@ -734,17 +735,19 @@
                         // Load QR code settings
                         if (data.qrcode) {
                             qrcodeInputs.toggle.checked = data.qrcode.enabled || false;
-                            qrcodeInputs.url.value = data.qrcode.url || '';
+                            qrcodeInputs.text.value = data.qrcode.text || '';
                             qrcodeInputs.description.value = data.qrcode.description || '';
 
-                            if (data.qrcode.url) {
+                            if (data.qrcode.text) {
                                 generateQRCodePreview();
                             }
                         }
+
                         // Load notice messages
                         if (data.notices) {
                             document.getElementById('notice-messages').value = data.notices || '';
                         }
+
                         // Load news settings
                         if (data.news) {
                             newsToggle.checked = data.news.enabled || false;
@@ -1046,10 +1049,10 @@
 
         // Generate QR code preview
         function generateQRCodePreview() {
-            const url = qrcodeInputs.url.value;
-            if (url) {
-                // Using Google Charts API to generate QR code
-                qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(url)}`;
+            const text = qrcodeInputs.text.value;
+            if (text) {
+                // Using api to generate QR code
+                qrImage.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(text)}`;
                 qrPreview.style.display = 'block';
             } else {
                 qrPreview.style.display = 'none';
@@ -1078,8 +1081,8 @@
                 const code = jsQR(imageData.data, imageData.width, imageData.height);
 
                 if (code) {
-                    // Populate the QR code URL field with the scanned data
-                    qrcodeInputs.url.value = code.data;
+                    // Populate the QR code text field with the scanned data
+                    qrcodeInputs.text.value = code.data;
                     showStatus("QR code scanned successfully!", "success");
 
                     // Generate preview if needed
@@ -1148,7 +1151,7 @@
             // Collect QR code settings
             settings.qrcode = {
                 enabled: qrcodeInputs.toggle.checked,
-                url: qrcodeInputs.url.value,
+                text: qrcodeInputs.text.value,
                 description: qrcodeInputs.description.value
             };
 
